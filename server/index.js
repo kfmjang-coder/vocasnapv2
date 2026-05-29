@@ -24,23 +24,30 @@ app.post('/api/extract', async (req, res) => {
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${KEY}`;
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 85_000);
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      signal: ctrl.signal,
       body: JSON.stringify({
         contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: mimeType, data: imageBase64 } }] }],
         generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
       }),
     });
-    clearTimeout(timer);
     const json = await r.json();
-    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]';
+
+    if (!r.ok) {
+      console.error('[Gemini error]', r.status, JSON.stringify(json));
+      return res.json({ words: [], debug: `Gemini ${r.status}: ${json?.error?.message || 'unknown'}` });
+    }
+    const cand = json?.candidates?.[0];
+    const text = cand?.content?.parts?.[0]?.text ?? '';
+    if (!text) {
+      console.error('[Gemini no text]', JSON.stringify(json).slice(0, 600));
+      return res.json({ words: [], debug: `no text (finishReason: ${cand?.finishReason || 'none'})` });
+    }
     const clean = text.replace(/```json|```/g, '').trim();
     let words = [];
-    try { words = JSON.parse(clean); } catch { words = []; }
+    try { words = JSON.parse(clean); }
+    catch { return res.json({ words: [], debug: 'JSON parse fail', raw: clean.slice(0, 200) }); }
     words = (Array.isArray(words) ? words : []).filter((w) => w && w.en).map((w) => ({
       en: String(w.en).trim(),
       ko: String(w.ko || '').trim(),
@@ -51,6 +58,7 @@ app.post('/api/extract', async (req, res) => {
     }));
     res.json({ words });
   } catch (e) {
+    console.error('[fetch fail]', e);
     res.status(502).json({ error: 'Gemini 호출 실패', detail: String(e) });
   }
 });
