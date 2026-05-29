@@ -10,6 +10,7 @@ interface WordsState {
   wordSets: WordSet[];
   words: Word[];
   createWordSet: (name: string) => WordSet;
+  replaceAll: (wordSets: WordSet[], words: Word[]) => void;
   todaySet: () => WordSet;
   addExtracted: (wordSetId: string, items: ExtractedWord[]) => void;
   updateWord: (id: string, patch: Partial<Word>) => void;
@@ -24,6 +25,8 @@ export const useWords = create<WordsState>()(
     (set, get) => ({
       wordSets: [],
       words: [],
+
+      replaceAll: (wordSets, words) => set({ wordSets, words }),
 
       createWordSet: (name) => {
         const existing = get().wordSets.find((w) => w.name === name);

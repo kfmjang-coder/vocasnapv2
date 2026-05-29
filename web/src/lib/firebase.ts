@@ -1,6 +1,11 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+  type Firestore,
+} from 'firebase/firestore';
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,11 +19,16 @@ export const isFirebaseConfigured = Boolean(config.apiKey && config.projectId);
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
+let googleProvider: GoogleAuthProvider | undefined;
 
 if (isFirebaseConfigured) {
   app = initializeApp(config);
   auth = getAuth(app);
-  db = getFirestore(app);
+  // Firestore with offline persistence (PWA offline support)
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentSingleTabManager(undefined) }),
+  });
+  googleProvider = new GoogleAuthProvider();
 }
 
-export { app, auth, db };
+export { app, auth, db, googleProvider };

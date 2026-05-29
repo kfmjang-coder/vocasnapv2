@@ -28,7 +28,13 @@ interface GameState {
   totalCorrect: number;
   addXp: (n: number) => void;
   recordStudy: (correct: boolean) => void;
+  replaceAll: (g: Partial<GameData>) => void;
 }
+
+export type GameData = Pick<
+  GameState,
+  'xp' | 'streak' | 'bestStreak' | 'lastStudy' | 'todayDate' | 'todayCount' | 'totalAnswered' | 'totalCorrect'
+>;
 
 export const useGame = create<GameState>()(
   persist(
@@ -43,6 +49,8 @@ export const useGame = create<GameState>()(
       totalCorrect: 0,
 
       addXp: (n) => set((s) => ({ xp: s.xp + n })),
+
+      replaceAll: (g) => set((s) => ({ ...s, ...g })),
 
       recordStudy: (correct) => {
         const today = todayISO();
