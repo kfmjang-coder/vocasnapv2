@@ -1,0 +1,23 @@
+{
+  "name": "vocasnap",
+  "version": "2.0.0",
+  "private": true,
+  "description": "AI vocabulary learning PWA (v2) — monorepo: web (Vite/React PWA) + server (Gemini proxy)",
+  "workspaces": [
+    "web",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n web,api -c magenta,cyan \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "npm --workspace web run dev",
+    "dev:api": "npm --workspace server run dev",
+    "build": "npm --workspace web run build",
+    "preview": "npm --workspace web run preview"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

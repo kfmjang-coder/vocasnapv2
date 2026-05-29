@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0e0e14;
+  color: #f4f4f8;
+  font-family: 'Pretendard', -apple-system, system-ui, sans-serif;
+  /* native-feel: no text selection, no overscroll bounce, no pull-to-refresh */
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* allow selection only inside editable fields */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* hide scrollbars for a cleaner native feel */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+@layer components {
+  .btn {
+    @apply flex items-center justify-center gap-2 rounded-[14px] border border-line bg-card text-txt text-base font-normal min-h-[50px] px-4 transition-transform active:scale-[0.99] select-none;
+  }
+  .btn-primary {
+    @apply bg-accent border-accent text-ink font-medium;
+  }
+  .btn-ghost {
+    @apply bg-transparent border-line;
+  }
+  .chip {
+    @apply rounded-full border border-lineHi bg-card text-sub text-[15px] px-[18px] py-[9px] transition-colors;
+  }
+  .chip-on {
+    @apply bg-accentDim border-accent text-accent;
+  }
+  .card {
+    @apply border border-line bg-card rounded-xl2;
+  }
+}
